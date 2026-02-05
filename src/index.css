@@ -1,0 +1,11 @@
+@import "tailwindcss";
+
+.custom-calendar-container .react-calendar {
+  width: 100% !important; 
+  border: none !important;
+  background: transparent;
+}
+
+.custom-calendar-container {
+  margin-bottom: 1.5rem;
+}

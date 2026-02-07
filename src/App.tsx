@@ -3,14 +3,11 @@ import Login from './components/Auth/Login';
 import Register from './components/Auth/Register';
 import Navbar from './components/Layout/Navbar';
 
-import { useState } from 'react';
 import { Link, Navigate, Route, BrowserRouter as Router, Routes } from 'react-router-dom';
 import AppointmentPage from './components/Appointment/AppointmentPage';
 import "./index.css";
 
 function App() {
-
-
 
   return (
     <Router>
@@ -19,7 +16,7 @@ function App() {
           <Route path="/" element={<AppointmentPage />}/>
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />}/>
-          <Route path="/details" element={<AppointmentDetails />}/>
+          <Route path="/details/:id" element={<AppointmentDetails />}/>
         </Routes>
     </Router>
   )

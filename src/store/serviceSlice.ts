@@ -1,46 +1,93 @@
-import type { PayloadAction } from '@reduxjs/toolkit';
-import { createSlice } from '@reduxjs/toolkit';
-
-
-interface Service { 
-    id: number;
-    title: string;
-    description: string; 
-}
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { MASTER_SLOTS } from '../../utils/appointmentHelpers';
+import { supabase, type Services } from '../../utils/supabase';
 
 interface ServiceState { 
-    services: Service[];
-    selectedService: Service | null;
+    services: Services[];
+    selectedService: Services | null;
+    availableSlots: string[];
+    error: string | null;
+    loading: boolean
 }
 
 const initialState: ServiceState = {
-    services: [
-        {
-            id: 1,
-            title: "General Consultation",
-            description: "Schedule a visit with a licensed physician for checkups, minor illnesses, follow-ups, or medical advice. Ideal for non-emergency concerns that require professional evaluation."
-        },
-        {
-            id: 2,
-            title: "General Consultation",
-            description: "nor illnesses, follow-ups, or medical advice. Ideal for non-emergency concerns that require professional evaluation."
-        }
-    ],
+    services: [],
     selectedService: null,
+    availableSlots: [...MASTER_SLOTS],
+    error: null,
+    loading: false,
 }
 
-const serviceSlice = createSlice({
-    name: "service",
-    initialState,
-    reducers: {
-        selectService: (state, action: PayloadAction<Service>) => { 
-            state.selectedService = action.payload;
-        }, 
-        clearSelection: (state) => {
-            state.selectedService = null;
+export const fetchServices = createAsyncThunk(
+    'blog/fetchBlogs', 
+    async (_, { rejectWithValue }) => { 
+        try {
+            const { data, error } = await supabase
+            .from('services')
+            .select('*')
+
+            if (error) throw error; 
+            return { service: data }
+        } catch ( error: any ) {
+            return rejectWithValue(error.message);
         }
+    }
+)
+
+export const fetchServicesById = createAsyncThunk(
+    'blog/fetchServicesById',
+    async (id: string, { rejectWithValue }) => {
+        try {
+            const { data, error } = await supabase
+                .from('services') 
+                .select('*')
+                .eq('id', id)
+                .single();
+
+            if (error) {
+                throw error;
+            }
+
+            return data; 
+            
+        } catch (error: any) {
+            return rejectWithValue(error.message);
+        }
+    }
+)
+
+const serviceSlice = createSlice({
+  name: 'service',
+  initialState,
+  reducers: {
+    clearError: (state) => {
+      state.error = null;
     },
+  },
+  extraReducers: (builder) => 
+    builder
+        .addCase(fetchServices.fulfilled, (state, action) => {
+            state.services = action.payload.service; 
+        })
+        .addCase(fetchServices.rejected, (state, action) => {
+            state.error = action.payload as string;
+        })
+        .addCase(fetchServices.pending, (state) => {
+            state.loading = true; 
+            state.error = null;
+        })
+        .addCase(fetchServicesById.fulfilled, (state, action) => {
+            state.selectedService = action.payload; 
+        })
+        .addCase(fetchServicesById.rejected, (state, action) => {
+            state.error = action.payload as string;
+        })
+        .addCase(fetchServicesById.pending, (state) => {
+            state.loading = true; 
+            state.error = null;
+        })
+        
 });
 
-export const { selectService, clearSelection } = serviceSlice.actions; 
+export const { clearError } = serviceSlice.actions; 
 export default serviceSlice.reducer;

@@ -30,7 +30,10 @@ const AppointmentPage = () => {
     <div className="flex min-h-screen bg-gray-50">
       {/* Sidebar */}
       <div className="w-64 bg-white border-r p-6 flex flex-col gap-2 shrink-0">
-        <h2 className="font-bold cursor-pointer text-lg">Dashboard</h2>
+        <h2 
+        className="font-bold cursor-pointer text-lg"
+        onClick={() => navigate('/dashboard')}
+        >Dashboard</h2>
         <button
         onClick={handleSetAppointment}
         className="transition-all duration-300 ease-in-out font-bold bg-black text-white rounded-2xl flex justify-center item-center py-[0.5rem] hover:bg-gray-800 cursor-pointer">

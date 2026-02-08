@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { type Appointments, supabase } from '../../utils/supabase';
-import { type RootState } from './store';
+
 
 interface AppointmentState {
     appointments: Appointments [] | null;
@@ -22,7 +22,7 @@ export const createAppointment = createAsyncThunk(
     'appointments/create',
     async (appointmentData: Omit<AppointmentInsert, 'client_id' | 'employee_id'>, { getState, rejectWithValue }) => { 
         try {
-            const state = getState() as RootState;
+            const state = getState() as any;
             const userId = state.auth.user?.id;
 
             if (!userId) throw new Error("Authentication required");
@@ -46,6 +46,22 @@ export const createAppointment = createAsyncThunk(
     }
 )
 
+export const fetchAppointments = createAsyncThunk(
+    'appointments/fetchAll',
+    async (_, {rejectWithValue}) => {
+        try {
+            const {data, error} = await supabase
+                .from('appointments')
+                .select('*')
+            
+            if (error) throw error;
+            return { appointment: data }
+        } catch (error: any ) {
+            return rejectWithValue(error.message)
+        }       
+    }
+)
+
 const appointmentSlice = createSlice({
     name: 'appointments',
     initialState, 
@@ -56,6 +72,16 @@ const appointmentSlice = createSlice({
     },
     extraReducers: (builder) => {
         builder
+            .addCase(fetchAppointments.fulfilled, (state, action) => {
+                state.appointments = action.payload.appointment; 
+            })
+            .addCase(fetchAppointments.rejected, (state, action) => {
+                state.error = action.payload as string;
+            })
+            .addCase(fetchAppointments.pending, (state) => {
+                state.loading = true; 
+                state.error = null;
+            })
             .addCase(createAppointment.pending, (state) => {
                 state.loading = true;
                 state.error = null;

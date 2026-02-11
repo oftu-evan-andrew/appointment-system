@@ -75,7 +75,7 @@ const Dashboard = () => {
 
     <div className="my-[10rem] mx-2">
       <h1 className="text-4xl flex flex-col items-center justify-center text-center">
-        <span className="font-bold">Active Medical Staff:</span> 100+
+        <span className="font-bold my-[1rem]">Active Medical Staff</span> 100+
       </h1>
       <p className="mt-[1rem] text-[1.1rem] text-gray-700 mt-2 mb-4 text-center gap-3 mx-auto line-h-[1.6]">
         With our actively growing medical staff, we are looking forward to providing you with the highest standard of healthcare and a supportive environment for your recovery. Our team is dedicated to continuous growth and excellence, ensuring that every patient receives personalized attention and world-class medical expertise in a facility designed for your comfort and peace of mind.

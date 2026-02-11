@@ -10,6 +10,7 @@ const AppointmentPage = () => {
   const navigate = useNavigate();
   const services = useSelector((state: RootState) => state.services.services)
   const dispatch = useDispatch<AppDispatch>();
+  const { user } = useSelector((state: RootState) => state.auth)
 
   const handleSetAppointment = () => {
     if (selectedId) {
@@ -35,10 +36,23 @@ const AppointmentPage = () => {
         onClick={() => navigate('/dashboard')}
         >Dashboard</h2>
         <button
-        onClick={handleSetAppointment}
-        className="transition-all duration-300 ease-in-out font-bold bg-black text-white rounded-2xl flex justify-center item-center py-[0.5rem] hover:bg-gray-800 cursor-pointer">
+        onClick={() => {
+          if (user?.role === 'employee') { 
+            navigate("/employee")
+          } 
+          else {handleSetAppointment()}
+        }}
+        className="transition-all duration-300 ease-in-out font-bold bg-black text-white rounded-2xl flex justify-center item-center py-[0.5rem] hover:bg-gray-800 cursor-pointer"
+        >
           Appointments
         </button>
+        {user?.role === 'admin' &&
+        <button
+        onClick={() => { if (user?.role === 'admin') navigate("/console") }}
+        className="transition-all duration-300 ease-in-out font-bold text-black rounded-2xl flex justify-center item-center py-[0.5rem] hover:bg-gray-300 cursor-pointer"
+        >
+          Console
+        </button>}
       </div>
 
       {/* Service Grid */}

@@ -14,6 +14,12 @@ export interface Appointments {
     appointment_date: string;
     appointment_time: string;
     status: string;
+    services?: {
+        title: string;
+    };
+    employee_details?: {
+        full_name: string;
+    };
 }
 
 export interface Services {

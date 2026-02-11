@@ -1,6 +1,8 @@
+import ManagementConsole from './components/Admin/ManagementConsole';
 import AppointmentDetails from './components/Appointment/AppointmentDetails';
 import AppointmentPage from './components/Appointment/AppointmentPage';
 import Dashboard from './components/Appointment/Dashboard';
+import EmployeePage from './components/Appointment/EmployeePage';
 import Login from './components/Auth/Login';
 import Register from './components/Auth/Register';
 import Navbar from './components/Layout/Navbar';
@@ -28,6 +30,8 @@ function App() {
           <Route path="/register" element={<Register />}/>
           <Route path="/details/:id" element={<AppointmentDetails />}/>
           <Route path="/dashboard" element={<Dashboard/> } />
+          <Route path="/employee" element={<EmployeePage />} />
+          <Route path="/console" element={<ManagementConsole />}/>
         </Routes>
     </Router>
   )

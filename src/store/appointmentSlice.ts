@@ -1,5 +1,6 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { type Appointments, supabase } from '../../utils/supabase';
+import type { RootState } from './store';
 
 
 interface AppointmentState {
@@ -46,16 +47,49 @@ export const createAppointment = createAsyncThunk(
     }
 )
 
-export const fetchAppointments = createAsyncThunk(
+export const fetchAppointments = createAsyncThunk<
+  { appointment: Appointments[] }, // 1. Success Return Type
+  void,                            // 2. Arguments (none)
+  { rejectValue: string }          // 3. Error Type
+>(
     'appointments/fetchAll',
-    async (_, {rejectWithValue}) => {
+    async (_, { rejectWithValue }) => {
+        try {
+            const { data, error } = await supabase
+                .from('appointments')
+                .select(`*, 
+                    services(title),
+                    employee_details:profiles!employee_id (
+                        full_name,
+                        role
+                    )
+                    `)
+                .eq('profiles.role', 'employee');
+            
+            if (error) throw error;
+            return { appointment: data as Appointments[] }; // Explicit cast
+        } catch (error: any) {
+            return rejectWithValue(error.message);
+        }       
+    }
+)
+
+export const fetchEmployeeAppointments = createAsyncThunk(
+    'appointments/fetchEmployeeAppointments',
+    async (employee_id: string, {rejectWithValue}) => {
         try {
             const {data, error} = await supabase
                 .from('appointments')
-                .select('*')
+                .select(`
+                    *, 
+                    services ( 
+                    title
+                    )`)
+                .eq('employee_id', employee_id)
+                .order('appointment_date', { ascending: true })
             
             if (error) throw error;
-            return { appointment: data }
+            return data;
         } catch (error: any ) {
             return rejectWithValue(error.message)
         }       
@@ -82,6 +116,16 @@ const appointmentSlice = createSlice({
                 state.loading = true; 
                 state.error = null;
             })
+            .addCase(fetchEmployeeAppointments.fulfilled, (state, action) => {
+                state.appointments = action.payload
+            })
+            .addCase(fetchEmployeeAppointments.rejected, (state, action) => {
+                state.error = action.payload as string;
+            })
+            .addCase(fetchEmployeeAppointments.pending, (state) => {
+                state.loading = true; 
+                state.error = null;
+            })
             .addCase(createAppointment.pending, (state) => {
                 state.loading = true;
                 state.error = null;
@@ -99,3 +143,4 @@ const appointmentSlice = createSlice({
 
 export const { clearError } = appointmentSlice.actions; 
 export default appointmentSlice.reducer;
+export const selectAllAppointments = (state: RootState) => state.appointments.appointments;
